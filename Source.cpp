@@ -1,10 +1,7 @@
 #include <iostream>
-#include <vector>
-#include <opencv2\opencv.hpp>
-#include <opencv2\ml\ml.hpp>
+#include <opencv2/opencv.hpp>
 #include <iomanip>
 #include <fstream>
-#include <string>
 
 using namespace std;
 using namespace cv;
@@ -239,13 +236,14 @@ int main()
 	}
 
 	Mat result2, binaryPredict;
-	/*
 
+	/*
 	Mat predictImage = imread("img/detectNum.png");
 	cvtColor(predictImage, predictImage, CV_BGR2GRAY);
 	threshold(predictImage, predictImage, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 	resize(predictImage, predictImage, Size(10, 20));
 */
+
 	Mat teacher2 = Mat(Size(10, 1), CV_32F);
 	for (int j = 0; j < teacher2.rows; j++)
 		for (int i = 0; i < teacher2.cols; i++)
@@ -257,6 +255,10 @@ int main()
 	Mat binaryPredictArray = (Mat_<float>(1,200) <<
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 		);
+	FileStorage cvfs("img/MatData2.xml", CV_STORAGE_WRITE);
+	write(cvfs, "binaryPredictArray", binaryPredictArray);
+
+
 	neuron2->train(binaryPredictArray, ROW_SAMPLE, teacher2);
 
 //	imshow("predictNum", binaryPredictArray);
