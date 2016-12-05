@@ -255,10 +255,15 @@ int main()
 	Mat binaryPredictArray = (Mat_<float>(1,200) <<
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 		);
-	FileStorage cvfs("img/MatData2.xml", CV_STORAGE_WRITE);
-	write(cvfs, "binaryPredictArray", binaryPredictArray);
+	FileStorage fs("img/MatData2.xml", CV_STORAGE_WRITE);
+	fs << "binaryPredictArray" << binaryPredictArray;
+	fs.release();
 
+	FileStorage fs2("img/Matdata2.xml", CV_STORAGE_READ);
+	Mat createdMat;
+	fs2["binaryPredictArray"] >> createdMat;
 
+	imshow("cameraMatix", createdMat);
 	neuron2->train(binaryPredictArray, ROW_SAMPLE, teacher2);
 
 //	imshow("predictNum", binaryPredictArray);
