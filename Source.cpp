@@ -1,74 +1,8 @@
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include <iomanip>
-#include <fstream>
-#include <stdio.h>
+#include "Header.h"
 
-using namespace std;
-using namespace cv;
-using namespace cv::ml;
-
-void *matrixArray(Mat matrixName)
-{
-	fstream inFile;
-	inFile.open("img/data.dat", ios::in | ios::app | ios::binary);
-
-	for (int i = 0; i < matrixName.rows; i++) {
-		for (int j = 0; j < matrixName.cols; j++) {
-			if (matrixName.rows-i==1 && matrixName.cols == j + 1) inFile << (int)(matrixName.at<uchar>(i, j)) / 255;
-			else inFile << (int)(matrixName.at<uchar>(i, j)) / 255 ;
-		}
-	}
-	inFile.close();
-	return 0;
-}
-
-char *matrixAbs()
-{
-	ifstream matrixAb;
-	//char fname[] =  "img/data.dat";
-	matrixAb.open("img/data.dat", ifstream::binary);
-	matrixAb.seekg(0, matrixAb.end);
-	int buffSize = matrixAb.tellg();
-	matrixAb.seekg(0, matrixAb.beg);
-
-	char *lines = new char[buffSize];
-	matrixAb.read(lines, buffSize);
-	cout << lines  << endl;
-	return lines;
-	delete[] lines;
-}
 
 int main()
 {
-
-	/*	Mat gray1, gray2, binaryMat;
-	for (int i = 0; i < 10; i++) {
-
-	stringstream imgss;
-	imgss << "img/" << "detectNum" << ".png";
-	Mat numImg = imread(imgss.str());
-	if (numImg.empty()) {
-	return 0;
-	}
-
-	stringstream saveImage;
-	saveImage << "img/gray" << "detectNum";
-	cvtColor(numImg, gray1, CV_BGR2GRAY);
-	threshold(gray1, gray2, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-	resize(gray2, binaryMat, Size(10, 20));
-	//imwrite(saveImage.str(), gray);
-	imshow(saveImage.str(), binaryMat);
-	matrixArray(binaryMat);
-	//	cout << matrixAbs() << endl;
-
-
-
-	FileStorage xmlFile("test.xml", FileStorage::WRITE);
-	Mat xmlMatrix = (Mat_<int>(3, 3) << 1,1,1,0,0,0,0,0,0);
-	xmlFile << "xmlMatrix" << xmlMatrix;
-	xmlFile.release();
-	*/
 
 	const int N_INPUT = 200;
 	const int N_HIDDEN = 10;
@@ -241,12 +175,6 @@ int main()
 
 	Mat original2,binaryOriginal2,result2, binaryPredict;
 
-	/*
-	Mat predictImage = imread("img/detectNum.png");
-	cvtColor(predictImage, predictImage, CV_BGR2GRAY);
-	threshold(predictImage, predictImage, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-	resize(predictImage, predictImage, Size(10, 20));
-	*/
 
 	Mat teacher2 = Mat(Size(10, 1), CV_32F);
 	for (int j = 0; j < teacher2.rows; j++)
@@ -264,15 +192,18 @@ int main()
 	fs << "binaryPredictArray" << binaryPredictArray;
 	fs.release();
 
-	original2 = imread("img/detectNum.png");
+	stringstream detectNum;
+	string fileN = "detectNum5";
+	detectNum << "img/" << fileN <<".png";
+	original2 = imread(detectNum.str());
 	cvtColor(original2,original2, CV_RGB2GRAY);
 	threshold(original2, original2, 0, 255, THRESH_BINARY | THRESH_OTSU);
 	resize(original2, binaryOriginal2, Size(10, 20));
-//	imwrite("img/binaryOriginal2.png", binaryOriginal2);
+	imwrite("img/binaryOriginal2.png", binaryOriginal2);
 
-	matrixArray(binaryOriginal2);
+	matrixArray(binaryOriginal2,fileN);
 	
-	FileStorage fs3("img/detectedNum.xml", FileStorage::WRITE);
+/* FileStorage fs3("img/detectedNum.xml", FileStorage::WRITE);
 	write(fs3, "originalArray", binaryOriginal2);
 	fs3.release();
 
@@ -281,9 +212,10 @@ int main()
 	fs2["originalArray"] >> createdMat;
 //	cout << createdMat << endl;
 	fs2.release();
+*/
 
 	FILE* fop;
-	fopen_s(&fop,"img/data.dat", "rb");
+	fopen_s(&fop,"img/detectNum5.dat", "rb");
 	if (fop == NULL) {
 		exit(0);
 	}
@@ -309,6 +241,7 @@ int main()
 	imshow("binaryNumMat", binaryNumMat);
 
 	fclose(fop);
+	cout << endl;
 
 	neuron2->train(binaryNumMat, ROW_SAMPLE, teacher2);
 
