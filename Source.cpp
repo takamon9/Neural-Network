@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <iomanip>
 #include <fstream>
+#include <stdio.h>
 
 using namespace std;
 using namespace cv;
@@ -10,12 +11,12 @@ using namespace cv::ml;
 void *matrixArray(Mat matrixName)
 {
 	fstream inFile;
-	inFile.open("data.dat", ios::in | ios::app | ios::binary);
+	inFile.open("img/data.dat", ios::in | ios::app | ios::binary);
 
 	for (int i = 0; i < matrixName.rows; i++) {
 		for (int j = 0; j < matrixName.cols; j++) {
-	 //		if (matrixName.rows == i + 1 && matrixName.cols == j + 1) inFile << (int)(matrixName.at<uchar>(i, j)) / 255;
-			 inFile << (int)(matrixName.at<uchar>(i, j)) / 255 << ",";
+			if (matrixName.rows-i==1 && matrixName.cols == j + 1) inFile << (int)(matrixName.at<uchar>(i, j)) / 255;
+			else inFile << (int)(matrixName.at<uchar>(i, j)) / 255 ;
 		}
 	}
 	inFile.close();
@@ -25,42 +26,43 @@ void *matrixArray(Mat matrixName)
 char *matrixAbs()
 {
 	ifstream matrixAb;
-	matrixAb.open("data.dat",ifstream::binary);
+	//char fname[] =  "img/data.dat";
+	matrixAb.open("img/data.dat", ifstream::binary);
 	matrixAb.seekg(0, matrixAb.end);
 	int buffSize = matrixAb.tellg();
 	matrixAb.seekg(0, matrixAb.beg);
 
 	char *lines = new char[buffSize];
 	matrixAb.read(lines, buffSize);
-//	cout << line  << endl;
+	cout << lines  << endl;
 	return lines;
 	delete[] lines;
 }
 
 int main()
 {
-	
-/*	Mat gray1, gray2, binaryMat;
+
+	/*	Mat gray1, gray2, binaryMat;
 	for (int i = 0; i < 10; i++) {
 
-		stringstream imgss;
-		imgss << "img/" << "detectNum" << ".png";
-		Mat numImg = imread(imgss.str());
-		if (numImg.empty()) {
-			return 0;
-		}
+	stringstream imgss;
+	imgss << "img/" << "detectNum" << ".png";
+	Mat numImg = imread(imgss.str());
+	if (numImg.empty()) {
+	return 0;
+	}
 
-		stringstream saveImage;
-		saveImage << "img/gray" << "detectNum";
-		cvtColor(numImg, gray1, CV_BGR2GRAY);
-		threshold(gray1, gray2, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-		resize(gray2, binaryMat, Size(10, 20));
-		//imwrite(saveImage.str(), gray);
-		imshow(saveImage.str(), binaryMat);
-		matrixArray(binaryMat);
-		//	cout << matrixAbs() << endl;
-	
-	
+	stringstream saveImage;
+	saveImage << "img/gray" << "detectNum";
+	cvtColor(numImg, gray1, CV_BGR2GRAY);
+	threshold(gray1, gray2, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+	resize(gray2, binaryMat, Size(10, 20));
+	//imwrite(saveImage.str(), gray);
+	imshow(saveImage.str(), binaryMat);
+	matrixArray(binaryMat);
+	//	cout << matrixAbs() << endl;
+
+
 
 	FileStorage xmlFile("test.xml", FileStorage::WRITE);
 	Mat xmlMatrix = (Mat_<int>(3, 3) << 1,1,1,0,0,0,0,0,0);
@@ -94,14 +96,14 @@ int main()
 		0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1,
 		0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1,
 		1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0,
-		1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 
+		1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
 		0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1,
 		1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,
-		1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 
+		1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
 		1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
 		1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -172,7 +174,7 @@ int main()
 		1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
 		1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1
-	);
+		);
 	imshow("data", number_data);
 
 	/*
@@ -181,27 +183,27 @@ int main()
 	Point pt1, pt2;
 	int d;
 	for(int j = 0;j<number_data.rows;j++)
-		for (int i = 0; i < number_data.cols; i++)
-		{
-			p = i / 5;
-			q = i % 5;
-			pt1 = Point(20 + j * 45 + q * 8, 20 + p * 8);
-			pt2 = Point(pt1.x + 5, pt1.y + 5);
-			d = 255 * (1 - number_data.at<float>(j, i));
-			rectangle(training_image, pt1, pt2, Scalar(d), -1);
-		}
+	for (int i = 0; i < number_data.cols; i++)
+	{
+	p = i / 5;
+	q = i % 5;
+	pt1 = Point(20 + j * 45 + q * 8, 20 + p * 8);
+	pt2 = Point(pt1.x + 5, pt1.y + 5);
+	d = 255 * (1 - number_data.at<float>(j, i));
+	rectangle(training_image, pt1, pt2, Scalar(d), -1);
+	}
 
-		*/
+	*/
 	Mat teacher = Mat(Size(10, 10), CV_32F);
-	for(int j = 0; j < teacher.rows ; j++)
+	for (int j = 0; j < teacher.rows; j++)
 		for (int i = 0; i < teacher.cols; i++)
 		{
 			if (i == j) teacher.at<float>(j, i) = 1.0f;
-			else teacher.at<float>(j, i) = 0.0f;	
+			else teacher.at<float>(j, i) = 0.0f;
 		}
 
 	neuron->train(number_data, ROW_SAMPLE, teacher);
-	
+
 	Mat test_data;
 	Mat results;
 	cout << fixed << right;
@@ -235,14 +237,16 @@ int main()
 		cout << setw(4) << i << "       " << max_location.x << "        " << Max_value << endl;
 	}
 
-	Mat result2, binaryPredict;
+	cout << endl;
+
+	Mat original2,binaryOriginal2,result2, binaryPredict;
 
 	/*
 	Mat predictImage = imread("img/detectNum.png");
 	cvtColor(predictImage, predictImage, CV_BGR2GRAY);
 	threshold(predictImage, predictImage, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 	resize(predictImage, predictImage, Size(10, 20));
-*/
+	*/
 
 	Mat teacher2 = Mat(Size(10, 1), CV_32F);
 	for (int j = 0; j < teacher2.rows; j++)
@@ -251,30 +255,72 @@ int main()
 			if (i == j) teacher2.at<float>(j, i) = 1.0f;
 			else teacher2.at<float>(j, i) = 0.0f;
 		}
-
-	Mat binaryPredictArray = (Mat_<float>(1,200) <<
+	
+	Mat binaryPredictArray = (Mat_<float>(1, 200) <<
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 		);
+
 	FileStorage fs("img/MatData2.xml", CV_STORAGE_WRITE);
 	fs << "binaryPredictArray" << binaryPredictArray;
 	fs.release();
 
-	FileStorage fs2("img/Matdata2.xml", CV_STORAGE_READ);
+	original2 = imread("img/detectNum.png");
+	cvtColor(original2,original2, CV_RGB2GRAY);
+	threshold(original2, original2, 0, 255, THRESH_BINARY | THRESH_OTSU);
+	resize(original2, binaryOriginal2, Size(10, 20));
+//	imwrite("img/binaryOriginal2.png", binaryOriginal2);
+
+	matrixArray(binaryOriginal2);
+	
+	FileStorage fs3("img/detectedNum.xml", FileStorage::WRITE);
+	write(fs3, "originalArray", binaryOriginal2);
+	fs3.release();
+
+	FileStorage fs2("img/detectedNum.xml", CV_STORAGE_READ);
 	Mat createdMat;
-	fs2["binaryPredictArray"] >> createdMat;
+	fs2["originalArray"] >> createdMat;
+//	cout << createdMat << endl;
+	fs2.release();
 
-	imshow("cameraMatix", createdMat);
-	neuron2->train(binaryPredictArray, ROW_SAMPLE, teacher2);
+	FILE* fop;
+	fopen_s(&fop,"img/data.dat", "rb");
+	if (fop == NULL) {
+		exit(0);
+	}
 
-//	imshow("predictNum", binaryPredictArray);
-	Mat neuralMat = binaryPredictArray.row(0);
+	char buf[200];
+	int fu[200];
+	int f;
+	f = fread(buf, sizeof(unsigned char), 200, fop);
+	Mat binaryNumMat = Mat(Size(200, 1), CV_32F);
+	for (int i = 0; i < f; i++){
+		fu[i] = buf[i]-48;
+		cout << fu[i];
+	}
+
+	cout << endl;
+	for (int j = 0; j < binaryNumMat.rows; j++)
+		for (int i = 0; i < binaryNumMat.cols; i++)
+		{
+			if (fu[i]==1) binaryNumMat.at<float>(j, i) = 1.0f;
+			else binaryNumMat.at<float>(j, i) = 0.0f;
+		}
+
+	imshow("binaryNumMat", binaryNumMat);
+
+	fclose(fop);
+
+	neuron2->train(binaryNumMat, ROW_SAMPLE, teacher2);
+
+	imshow("predictNum", binaryPredictArray);
+	Mat neuralMat = binaryNumMat.row(0);
 	neuron->predict(neuralMat, result2);
 
-	for (int j= 0;j < 10;j++)
+	for (int j = 0; j < 10; j++)
 	{
 		cout << setw(6) << setprecision(3) << result2.at<float>(0, j) << " ";
 	}
-	
+
 	cout << endl;
 	waitKey(0);
 	destroyAllWindows();
