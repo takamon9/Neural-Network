@@ -111,23 +111,6 @@ int main()
 		);
 	imshow("data", number_data);
 
-	/*
-	Mat training_image = Mat(Size(484, 94), CV_8UC1, Scalar(200));
-	int p, q;
-	Point pt1, pt2;
-	int d;
-	for(int j = 0;j<number_data.rows;j++)
-	for (int i = 0; i < number_data.cols; i++)
-	{
-	p = i / 5;
-	q = i % 5;
-	pt1 = Point(20 + j * 45 + q * 8, 20 + p * 8);
-	pt2 = Point(pt1.x + 5, pt1.y + 5);
-	d = 255 * (1 - number_data.at<float>(j, i));
-	rectangle(training_image, pt1, pt2, Scalar(d), -1);
-	}
-
-	*/
 	Mat teacher = Mat(Size(10, 10), CV_32F);
 	for (int j = 0; j < teacher.rows; j++)
 		for (int i = 0; i < teacher.cols; i++)
@@ -161,7 +144,7 @@ int main()
 	Point max_location;
 	cout << fixed << right;
 	cout << endl;
-	cout << "Input   Prediction@@Value" << endl;
+	cout << "Input   Predictionã€€ã€€Value" << endl;
 	cout << "------ -----------  ----------" << endl;
 	for (int i = 0; i < N_OUTPUT; i++)
 	{
@@ -173,7 +156,7 @@ int main()
 
 	cout << endl;
 
-	Mat original2,binaryOriginal2,result2, binaryPredict;
+	Mat original2, binaryOriginal2, result2, binaryPredict;
 
 
 	Mat teacher2 = Mat(Size(10, 1), CV_32F);
@@ -183,71 +166,73 @@ int main()
 			if (i == j) teacher2.at<float>(j, i) = 1.0f;
 			else teacher2.at<float>(j, i) = 0.0f;
 		}
-	
-	Mat binaryPredictArray = (Mat_<float>(1, 200) <<
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-		);
-
-	FileStorage fs("img/MatData2.xml", CV_STORAGE_WRITE);
-	fs << "binaryPredictArray" << binaryPredictArray;
-	fs.release();
 
 	stringstream detectNum;
-	string fileN = "detectNum5";
-	detectNum << "img/" << fileN <<".png";
-	original2 = imread(detectNum.str());
-	cvtColor(original2,original2, CV_RGB2GRAY);
+	string fileN = "detectNum9";
+	string folderN = "img/";
+	string bb = fileN;
+	string pngN = ".png";
+	string cc = ".dat";
+	string strBuf = folderN + bb + cc;
+	string pngBuf = folderN + bb + pngN;
+
+	detectNum << "img/" << fileN << ".png";
+	original2 = imread(pngBuf);
+	if (original2.empty()){
+		cout << "We cannot open the image file";
+		system("pause");
+		return 0;
+	}
+
+	cvtColor(original2, original2, CV_RGB2GRAY);
 	threshold(original2, original2, 0, 255, THRESH_BINARY | THRESH_OTSU);
 	resize(original2, binaryOriginal2, Size(10, 20));
 	imwrite("img/binaryOriginal2.png", binaryOriginal2);
 
-	matrixArray(binaryOriginal2,fileN);
-	
-/* FileStorage fs3("img/detectedNum.xml", FileStorage::WRITE);
-	write(fs3, "originalArray", binaryOriginal2);
-	fs3.release();
-
-	FileStorage fs2("img/detectedNum.xml", CV_STORAGE_READ);
-	Mat createdMat;
-	fs2["originalArray"] >> createdMat;
-//	cout << createdMat << endl;
-	fs2.release();
-*/
+	matrixArray(binaryOriginal2, fileN);
 
 	FILE* fop;
-	fopen_s(&fop,"img/detectNum5.dat", "rb");
+	
+	fopen_s(&fop, strBuf.c_str(), "rb");
 	if (fop == NULL) {
+		cout << "We cannot open the file." << endl;
+		system("pause");
 		exit(0);
 	}
 
 	char buf[200];
-	int fu[200];
+	int intbuf[200];
 	int f;
 	f = fread(buf, sizeof(unsigned char), 200, fop);
 	Mat binaryNumMat = Mat(Size(200, 1), CV_32F);
-	for (int i = 0; i < f; i++){
-		fu[i] = buf[i]-48;
-		cout << fu[i];
+	for (int i = 0; i < f; i++) {
+		intbuf[i] = buf[i] - 48;
+		cout << intbuf[i];
 	}
 
 	cout << endl;
+
 	for (int j = 0; j < binaryNumMat.rows; j++)
 		for (int i = 0; i < binaryNumMat.cols; i++)
 		{
-			if (fu[i]==1) binaryNumMat.at<float>(j, i) = 1.0f;
+			if (intbuf[i] == 1) binaryNumMat.at<float>(j, i) = 1.0f;
 			else binaryNumMat.at<float>(j, i) = 0.0f;
 		}
 
 	imshow("binaryNumMat", binaryNumMat);
-
+	
 	fclose(fop);
 	cout << endl;
 
 	neuron2->train(binaryNumMat, ROW_SAMPLE, teacher2);
 
-	imshow("predictNum", binaryPredictArray);
+//	imshow("predictNum", binaryPredictArray);
 	Mat neuralMat = binaryNumMat.row(0);
+	Point maxLocationResult;
 	neuron->predict(neuralMat, result2);
+	minMaxLoc(result2, NULL,NULL,NULL,&maxLocationResult);
+	cout << "Detected Number is; " << maxLocationResult.x << endl;
+	cout << endl;
 
 	for (int j = 0; j < 10; j++)
 	{
